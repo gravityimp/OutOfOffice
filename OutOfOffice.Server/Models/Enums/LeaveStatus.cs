@@ -1,4 +1,4 @@
-﻿namespace OutOfOffice.Server.Utils.Enums
+﻿namespace OutOfOffice.Server.Models.Enums
 {
     public enum LeaveStatus
     {

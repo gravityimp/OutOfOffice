@@ -1,12 +1,24 @@
-﻿namespace OutOfOffice.Server.Models
+﻿using OutOfOffice.Server.Models.Enums;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace OutOfOffice.Server.Models
 {
     public class ApprovalRequest
     {
-        public int ApprovalRequestId { get; set; }
-        public int LeaveRequestId { get; set; }
-        public int ApproverId { get; set; }
-        public bool Approved { get; set; }
-        public LeaveRequest LeaveRequest { get; set; }
-        public Employee Approver { get; set; }
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public ApprovalRequestStatus Status { get; set; }
+
+        [Required]
+        public int LeaveRequest { get; set; }
+        [ForeignKey("LeaveRequest")]
+        public LeaveRequest LeaveRequestRef { get; set; }
+
+        [Required]
+        public int Approver { get; set; }
+        [ForeignKey("Approver")]
+        public Employee ApproverRef { get; set; }
     }
 }
