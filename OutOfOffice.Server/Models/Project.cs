@@ -8,25 +8,21 @@ namespace OutOfOffice.Server.Models
     {
         [Key]
         public int Id { get; set; }
-
+        [Required]
+        public ProjectStatus Status { get; set; }
         [Required]
         public ProjectType ProjectType { get; set; }
-
-        [Required]
+        [Required, DataType(DataType.Date)]
+        public DateOnly StartDate { get; set; }
         [DataType(DataType.Date)]
-        public DateTime StartDate { get; set; }
-
-        [DataType(DataType.Date)]
-        public DateTime? EndDate { get; set; }
+        public DateOnly? EndDate { get; set; }
+        public string? Comment { get; set; }
 
         [Required]
         public int ProjectManager { get; set; }
-        [ForeignKey("ProjectManagerId")]
-        public Employee ProjectManagerRef { get; set; }
+        [ForeignKey("ProjectManager")]
+        public Employee? ProjectManagerRef { get; set; }
 
-        [Required]
-        public ProjectStatus Status { get; set; }
-
-        public string Comment { get; set; }
+        public List<Employee>? Employees { get; set; }
     }
 }

@@ -14,11 +14,11 @@ namespace OutOfOffice.Server.Models
         [Required]
         public int LeaveRequest { get; set; }
         [ForeignKey("LeaveRequest")]
-        public LeaveRequest LeaveRequestRef { get; set; }
+        public LeaveRequest? LeaveRequestRef { get; set; }
 
         [Required]
         public int Approver { get; set; }
         [ForeignKey("Approver")]
-        public Employee ApproverRef { get; set; }
+        public Employee? ApproverRef { get; set; }
     }
 }

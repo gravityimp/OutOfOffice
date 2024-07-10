@@ -20,10 +20,14 @@ namespace OutOfOffice.Server.Models
         public int OutOfOfficeBalance { get; set; }
         public byte[]? Photo { get; set; }
 
-        [Required, ForeignKey("PeoplePartnerId")]
+        [Required]
         public int PeoplePartner { get; set; }
-        public Employee PeoplePartnerRef { get; set; } = null!;
+        [ForeignKey("PeoplePartner")]
+        public Employee? PeoplePartnerRef { get; set; }
 
-        public ICollection<LeaveRequest> LeaveRequests { get; set; }
+        public ICollection<Project>? Projects { get; set; }
+        public ICollection<Project>? ManagedProjects { get; set; }
+        public ICollection<LeaveRequest>? LeaveRequests { get; set; }
+        public ICollection<ApprovalRequest>? ApprovalRequests { get; set; }
     }
 }

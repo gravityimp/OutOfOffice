@@ -41,7 +41,7 @@ namespace OutOfOffice.Server.Controllers
         public async Task<ActionResult<ApprovalRequest>> Create(ApprovalRequest request)
         {
             await _approvalRequestRepository.Create(request);
-            return CreatedAtAction("GetEmployee", new { id = request.Id }, request);
+            return CreatedAtAction("GetApprovalRequest", new { id = request.Id }, request);
         }
 
         [HttpPut("{id}")]

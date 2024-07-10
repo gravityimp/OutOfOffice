@@ -11,9 +11,9 @@ namespace OutOfOffice.Server.Models
         [Required]
         public LeaveStatus Status { get; set; }
         [Required]
-        public DateTime StartDate { get; set; }
+        public DateOnly StartDate { get; set; }
         [Required]
-        public DateTime EndDate { get; set; }
+        public DateOnly EndDate { get; set; }
         [Required]
         public LeaveReason Reason { get; set; }
         public string? Comment { get; set; }
@@ -21,7 +21,8 @@ namespace OutOfOffice.Server.Models
         [Required]
         public int Employee { get; set; }
         [ForeignKey("Employee")]
-        public Employee EmployeeRef { get; set; }
-        public ICollection<ApprovalRequest> ApprovalRequests { get; set; }
+        public Employee? EmployeeRef { get; set; }
+
+        public ICollection<ApprovalRequest>? ApprovalRequests { get; set; }
     }
 }
