@@ -22,46 +22,46 @@ namespace OutOfOffice.Server.Data.Repositories
 
             /* Filtering */
 
-            // Employee Id Filter
-            if (employeeFilter.Id != null)
+            // Filter Employee Id
+            if (employeeFilter.Id.HasValue)
             {
                 query = query.Where(e => e.Id == employeeFilter.Id);
             }
 
-            // Employee Name Filter
+            // Filter Employee Name
             if (!string.IsNullOrEmpty(employeeFilter.FullName))
             {
-                query = query.Where(e => e.FullName.Contains(employeeFilter.FullName));
+                query = query.Where(e => e.FullName.ToLower().Contains(employeeFilter.FullName.ToLower()));
             }
 
-            // Employee Subdivision Filter
-            if (employeeFilter.Subdivisions != null && employeeFilter.Subdivisions.Count > 0)
+            // Filter Employee Subdivision
+            if (!employeeFilter.Subdivisions.IsNullOrEmpty())
             {
                 query = query.Where(e => employeeFilter.Subdivisions.Contains(e.Subdivision));
             }
 
-            // Employee Position Filter
-            if (employeeFilter.Positions != null && employeeFilter.Positions.Count > 0)
+            // Filter Employee Position
+            if (!employeeFilter.Positions.IsNullOrEmpty())
             {
                 query = query.Where(e => employeeFilter.Positions.Contains(e.Position));
             }
 
-            // Employee Status Filter
-            if (employeeFilter.Statuses != null && employeeFilter.Statuses.Count > 0)
+            // Filter Employee Status
+            if (!employeeFilter.Statuses.IsNullOrEmpty())
             {
                 query = query.Where(e => employeeFilter.Statuses.Contains(e.Status));
             }
 
-            // Partner Id Filter
-            if (employeeFilter.PeoplePartnerId != null)
+            // Filter Partner Id
+            if (employeeFilter.PeoplePartnerId.HasValue)
             {
                 query = query.Where(e => e.PeoplePartner == employeeFilter.PeoplePartnerId);
             }
 
-            // Partner Name Filter
+            // Filter Partner Name
             if (!string.IsNullOrEmpty(employeeFilter.PeoplePartnerName))
             {
-                query = query.Where(e => e.PeoplePartnerRef.FullName.Contains(employeeFilter.PeoplePartnerName));
+                query = query.Where(e => e.PeoplePartnerRef.FullName.ToLower().Contains(employeeFilter.PeoplePartnerName.ToLower()));
             }
 
             // Apply pagination

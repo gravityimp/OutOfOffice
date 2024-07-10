@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using OutOfOffice.Server.Data.Repositories.Filters;
 using OutOfOffice.Server.Data.Repositories.Interfaces;
 using OutOfOffice.Server.Data.Responses;
@@ -24,34 +25,44 @@ namespace OutOfOffice.Server.Data.Repositories
 
             /* Apply Filtering */
 
-            // Project Type Filter
-            if (projectFilter.ProjectTypes != null && projectFilter.ProjectTypes.Count > 0)
+            // Filter Project Id
+            if (projectFilter.Id.HasValue)
+            {
+                query = query.Where(p => p.Id == projectFilter.Id);
+            }
+
+            // Filter Project Status
+            if (!projectFilter.Statuses.IsNullOrEmpty())
+            {
+                query = query.Where(p => projectFilter.Statuses.Contains(p.Status));
+            }
+
+            // Filter Project Type
+            if (!projectFilter.ProjectTypes.IsNullOrEmpty())
             {
                 query = query.Where(p => projectFilter.ProjectTypes.Contains(p.ProjectType));
             }
 
+            // Filter Start Date
             if (projectFilter.StartDate.HasValue)
             {
                 query = query.Where(p => p.StartDate == projectFilter.StartDate);
             }
 
+            // Filter End Date
             if (projectFilter.EndDate.HasValue)
             {
                 query = query.Where(p => p.EndDate == projectFilter.EndDate);
             }
 
+            // Filter Project Manager Id or Full Name
             if (projectFilter.ProjectManagerId.HasValue)
             {
                 query = query.Where(p => p.ProjectManager == projectFilter.ProjectManagerId);
             }
             else if (!string.IsNullOrEmpty(projectFilter.ProjectManagerName))
             {
-                query = query.Where(p => p.ProjectManagerRef.FullName.Contains(projectFilter.ProjectManagerName));
-            }
-
-            if (projectFilter.Statuses != null && projectFilter.Statuses.Count > 0)
-            {
-                query = query.Where(p => projectFilter.Statuses.Contains(p.Status));
+                query = query.Where(p => p.ProjectManagerRef.FullName.ToLower().Contains(projectFilter.ProjectManagerName.ToLower()));
             }
 
             // Pagination

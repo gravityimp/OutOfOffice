@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using OutOfOffice.Server.Data.Repositories.Filters;
 using OutOfOffice.Server.Data.Repositories.Interfaces;
 using OutOfOffice.Server.Data.Responses;
@@ -24,6 +25,34 @@ namespace OutOfOffice.Server.Data.Repositories
 
             /* Apply Filtering */
 
+            // Filter Id
+            if (filter.Id.HasValue)
+            {
+                query = query.Where(ar => ar.Id == filter.Id);
+            }
+
+            // Filter Status
+            if (!filter.Statuses.IsNullOrEmpty())
+            {
+                query = query.Where(ar => filter.Statuses.Contains(ar.Status));
+            }
+
+            // Filter Leave Request Id
+            if (filter.LeaveRequestId.HasValue)
+            {
+                query = query.Where(ar => ar.LeaveRequest == filter.LeaveRequestId);
+            }
+
+            // Filter Approver Id or Approver FullName
+            if (filter.ApproverId.HasValue)
+            {
+                query = query.Where(ar => ar.Approver == filter.ApproverId);
+            }
+            else if (!string.IsNullOrEmpty(filter.ApproverName))
+            {
+                query = query.Where(ar => ar.ApproverRef!.FullName.ToLower().Contains(filter.ApproverName.ToLower()));
+            }
+            
             // Pagination
             var totalEntries = await query.CountAsync();
             var result = await query
