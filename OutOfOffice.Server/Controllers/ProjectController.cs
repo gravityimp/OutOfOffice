@@ -1,83 +1,67 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OutOfOffice.Server.Data.Repositories.Filters;
+using OutOfOffice.Server.Data.Repositories;
+using OutOfOffice.Server.Data.Repositories.Interfaces;
+using OutOfOffice.Server.Models;
 
 namespace OutOfOffice.Server.Controllers
 {
-    public class ProjectController : Controller
+    [ApiController]
+    [Route("api/projects")]
+    public class ProjectController : ControllerBase
     {
-        // GET: ProjectController
-        public ActionResult Index()
+        private readonly IProjectRepository _projectRepository;
+
+        public ProjectController(IProjectRepository projectRepository)
         {
-            return View();
+            _projectRepository = projectRepository;
         }
 
-        // GET: ProjectController/Details/5
-        public ActionResult Details(int id)
+        [HttpGet]
+        public async Task<ActionResult> Get(
+            [FromQuery] Pagination pagination,
+            [FromQuery] ProjectFilter filter
+        )
         {
-            return View();
+            return Ok(await _projectRepository.Get(pagination, filter));
         }
 
-        // GET: ProjectController/Create
-        public ActionResult Create()
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Project>> GetById(int id)
         {
-            return View();
+            var project = await _projectRepository.GetById(id);
+            if (project == null)
+            {
+                return NotFound();
+            }
+            return Ok(project);
         }
 
-        // POST: ProjectController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult<Employee>> Create(Project project)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            await _projectRepository.Create(project);
+            return CreatedAtAction("GetProject", new { id = project.Id }, project);
         }
 
-        // GET: ProjectController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, Project project)
         {
-            return View();
+            if (id != project.Id)
+            {
+                return BadRequest();
+            }
+
+            await _projectRepository.Update(project);
+            return NoContent();
         }
 
-        // POST: ProjectController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: ProjectController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: ProjectController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            await _projectRepository.Delete(id);
+            return NoContent();
         }
     }
 }

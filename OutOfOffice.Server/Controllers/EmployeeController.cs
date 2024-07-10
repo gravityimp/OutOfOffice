@@ -18,18 +18,18 @@ namespace OutOfOffice.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetEmployees(
+        public async Task<ActionResult> Get(
             [FromQuery] Pagination pagination,
             [FromQuery] EmployeeFilter employeeFilter
         )
         {
-            return Ok(await _employeeRepository.GetEmployees(pagination, employeeFilter));
+            return Ok(await _employeeRepository.Get(pagination, employeeFilter));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetEmployee(int id)
+        public async Task<ActionResult<Employee>> GetById(int id)
         {
-            var employee = await _employeeRepository.GetEmployeeById(id);
+            var employee = await _employeeRepository.GetById(id);
             if (employee == null)
             {
                 return NotFound();
@@ -38,28 +38,28 @@ namespace OutOfOffice.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
+        public async Task<ActionResult<Employee>> Create(Employee employee)
         {
-            await _employeeRepository.AddEmployee(employee);
+            await _employeeRepository.Create(employee);
             return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployee(int id, Employee employee)
+        public async Task<IActionResult> Update(int id, Employee employee)
         {
             if (id != employee.Id)
             {
                 return BadRequest();
             }
 
-            await _employeeRepository.UpdateEmployee(employee);
+            await _employeeRepository.Update(employee);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            await _employeeRepository.DeleteEmployee(id);
+            await _employeeRepository.Delete(id);
             return NoContent();
         }
     }
