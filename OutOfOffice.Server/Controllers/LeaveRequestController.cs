@@ -56,10 +56,15 @@ namespace OutOfOffice.Server.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpPut("{id}/submit")]
+        public async Task<IActionResult> SubmitRequest(int id)
         {
-            await _leaveRequestRepository.Delete(id);
+            return NoContent();
+        }
+
+        [HttpPut("{id}/cancel")]
+        public async Task<IActionResult> CancelRequest(int id)
+        {
             return NoContent();
         }
     }

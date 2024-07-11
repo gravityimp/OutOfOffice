@@ -1,22 +1,26 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OutOfOffice.Server.Data.Repositories.Filters;
 using OutOfOffice.Server.Data.Repositories.Interfaces;
 using OutOfOffice.Server.Data.Responses;
 using OutOfOffice.Server.Models;
+using OutOfOffice.Server.Models.Dto.Employee;
 
 namespace OutOfOffice.Server.Data.Repositories
 {
     public class EmployeeRepository : IEmployeeRepository
     {
         private readonly OutOfOfficeDbContext _context;
+        private readonly IMapper _mapper;
 
-        public EmployeeRepository(OutOfOfficeDbContext context)
+        public EmployeeRepository(OutOfOfficeDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<PageResponse<Employee>> Get(Pagination pagination, EmployeeFilter employeeFilter)
+        public async Task<PageResponse<EmployeeDtoGet>> Get(Pagination pagination, EmployeeFilter employeeFilter)
         {
             var query = _context.Employees.AsQueryable();
 
@@ -66,13 +70,15 @@ namespace OutOfOffice.Server.Data.Repositories
 
             // Apply pagination
             var totalEntries = await query.CountAsync();
-            var result = await query
+            var entries = await query
                 .Skip((pagination.Page - 1) * pagination.Count)
                 .Take(pagination.Count)
                 .ToListAsync();
 
+            var result = _mapper.Map<List<EmployeeDtoGet>>(entries);
+
             // Generate Pagination Response
-            return new PageResponse<Employee>
+            return new PageResponse<EmployeeDtoGet>
             {
                 Data = result,
                 Page = pagination.Page,
@@ -83,7 +89,10 @@ namespace OutOfOffice.Server.Data.Repositories
 
         public async Task<Employee> GetById(int id)
         {
-            return await _context.Employees.FindAsync(id);
+            var employee = await _context.Employees
+                .Include(e => e.PeoplePartnerRef)
+                .FirstOrDefaultAsync(e => e.Id == id);
+            return employee;
         }
 
         public async Task Create(Employee employee)

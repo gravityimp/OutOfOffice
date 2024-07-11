@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using OutOfOffice.Server.Data.Repositories.Filters;
 using OutOfOffice.Server.Data.Repositories.Interfaces;
 using OutOfOffice.Server.Models;
+using OutOfOffice.Server.Models.Dto.Employee;
 
 namespace OutOfOffice.Server.Controllers
 {
@@ -11,10 +13,12 @@ namespace OutOfOffice.Server.Controllers
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IMapper _mapper;
 
-        public EmployeeController(IEmployeeRepository employeeRepository)
+        public EmployeeController(IEmployeeRepository employeeRepository, IMapper mapper)
         {
             _employeeRepository = employeeRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -23,25 +27,29 @@ namespace OutOfOffice.Server.Controllers
             [FromQuery] EmployeeFilter employeeFilter
         )
         {
-            return Ok(await _employeeRepository.Get(pagination, employeeFilter));
+            var employees = await _employeeRepository.Get(pagination, employeeFilter);
+            return Ok(employees);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetById(int id)
+        public async Task<ActionResult> GetById(int id)
         {
             var employee = await _employeeRepository.GetById(id);
             if (employee == null)
             {
                 return NotFound();
             }
-            return Ok(employee);
+
+            var result = _mapper.Map<EmployeeDtoGet>(employee);
+            return Ok(result);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Employee>> Create(Employee employee)
+        public async Task<ActionResult> Create(EmployeeDtoPost employeeDto)
         {
+            Employee employee = _mapper.Map<Employee>(employeeDto);
             await _employeeRepository.Create(employee);
-            return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
+            return Ok("Successully added new employee!");
         }
 
         [HttpPut("{id}")]

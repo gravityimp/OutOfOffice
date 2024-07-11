@@ -7,7 +7,7 @@ namespace OutOfOffice.Server.Data.Repositories.Interfaces
 {
     public interface IRepository<T, F>
     {
-        public Task<PageResponse<T>> Get(Pagination pagination, F filter);
+        public Task<PageResponse<T>> Get(Pagination pagination, F filter) { throw new NotImplementedException(); }
         public Task<T> GetById(int id);
         public Task Create(T entry);
         public Task Update(T entry);

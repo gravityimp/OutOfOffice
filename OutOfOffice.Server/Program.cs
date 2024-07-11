@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using OutOfOffice.Server.Data;
 using OutOfOffice.Server.Data.Repositories;
 using OutOfOffice.Server.Data.Repositories.Interfaces;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,8 +16,10 @@ builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
 builder.Services.AddScoped<IApprovalRequestRepository, ApprovalRequestRepository>();
 
 builder.Services.AddControllers();
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddDateOnlyTimeOnlyStringConverters();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();

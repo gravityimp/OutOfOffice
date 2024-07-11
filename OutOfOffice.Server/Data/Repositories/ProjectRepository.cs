@@ -1,25 +1,26 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OutOfOffice.Server.Data.Repositories.Filters;
 using OutOfOffice.Server.Data.Repositories.Interfaces;
 using OutOfOffice.Server.Data.Responses;
-using OutOfOffice.Server.Data.Responses.Interfaces;
 using OutOfOffice.Server.Models;
+using OutOfOffice.Server.Models.Dto.Project;
 
 namespace OutOfOffice.Server.Data.Repositories
 {
     public class ProjectRepository : IProjectRepository
     {
         private readonly OutOfOfficeDbContext _context;
+        private readonly IMapper _mapper;
 
-        public ProjectRepository(OutOfOfficeDbContext context)
+        public ProjectRepository(OutOfOfficeDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<PageResponse<Project>> Get(Pagination pagination, ProjectFilter projectFilter)
+        public async Task<PageResponse<ProjectDtoGet>> Get(Pagination pagination, ProjectFilter projectFilter)
         {
             var query = _context.Projects.AsQueryable();
 
@@ -67,14 +68,17 @@ namespace OutOfOffice.Server.Data.Repositories
 
             // Pagination
             var totalEntries = await query.CountAsync();
-            var projects = await query
+            var entries = await query
+                .Include(e => e.ProjectManagerRef)
                 .Skip((pagination.Page - 1) * pagination.Count)
                 .Take(pagination.Count)
                 .ToListAsync();
 
-            return new PageResponse<Project>
+            var result = _mapper.Map<List<ProjectDtoGet>>(entries);
+
+            return new PageResponse<ProjectDtoGet>
             {
-                Data = projects,
+                Data = result,
                 Page = pagination.Page,
                 TotalPages = (int)Math.Ceiling(totalEntries / (double)pagination.Count),
                 TotalEntries = totalEntries
@@ -83,7 +87,10 @@ namespace OutOfOffice.Server.Data.Repositories
 
         public async Task<Project> GetById(int id)
         {
-            return await _context.Projects.FindAsync(id);
+            var project = await _context.Projects
+                .Include(p => p.ProjectManagerRef)
+                .FirstOrDefaultAsync(p => p.Id == id);
+            return project;
         }
 
         public async Task Create(Project project)

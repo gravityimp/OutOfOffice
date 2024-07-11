@@ -23,6 +23,6 @@ namespace OutOfOffice.Server.Models
         [ForeignKey("ProjectManager")]
         public Employee? ProjectManagerRef { get; set; }
 
-        public List<Employee>? Employees { get; set; }
+        public ICollection<Employee>? Employees { get; set; }
     }
 }
